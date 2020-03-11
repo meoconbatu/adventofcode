@@ -119,9 +119,10 @@ func processIntcode(ins, ins4 []int, nextPoint *int, r io.Reader, w io.Writer) b
 			var i int
 			n, _ := fmt.Fscan(r, &i)
 			if n == 0 {
+				// time.Sleep(time.Second)
 				continue
 			}
-			fmt.Printf("in=%d\n", i)
+			// fmt.Printf("in=%d\n", i)
 			ins[pos1] = i
 			break
 		}
@@ -134,9 +135,10 @@ func processIntcode(ins, ins4 []int, nextPoint *int, r io.Reader, w io.Writer) b
 			val = ins[pos1]
 		}
 		for {
-			fmt.Printf("out=%d\n", val)
+			// fmt.Printf("out=%d\n", val)
 			n, err := fmt.Fprintf(w, "%d", val)
 			if n == 0 || err != nil {
+				// time.Sleep(time.Second)
 				continue
 			}
 			break
