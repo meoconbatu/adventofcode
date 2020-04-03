@@ -24,21 +24,21 @@ func day7() {
 
 	ins := strings.Split(scanner.Text(), ",")
 
-	originalIns := make([]int, len(ins))
+	originalIns := make([]int64, len(ins))
 	for i := range originalIns {
-		originalIns[i], _ = strconv.Atoi(ins[i])
+		originalIns[i], _ = strconv.ParseInt(ins[i], 10, 64)
 	}
 
-	copyIns1 := make([]int, len(originalIns))
+	copyIns1 := make([]int64, len(originalIns))
 	copy(copyIns1, originalIns)
 	part1(copyIns1)
 
-	copyIns2 := make([]int, len(originalIns))
+	copyIns2 := make([]int64, len(originalIns))
 	copy(copyIns2, originalIns)
 	part2(copyIns2)
 
 }
-func part1(originalIns []int) {
+func part1(originalIns []int64) {
 	max := 0
 	for i := 0; i <= 4; i = i + 1 {
 		for j := 0; j <= 4; j = j + 1 {
@@ -61,12 +61,12 @@ func part1(originalIns []int) {
 	fmt.Println(max)
 }
 
-func processExtendMulti(signals []int, settingSequence []string) int {
+func processExtendMulti(signals []int64, settingSequence []string) int {
 	temp1, temp2 := &bytes.Buffer{}, &bytes.Buffer{}
 	temp2.WriteString("0")
 	// fmt.Println(settingSequence)
 	for _, sq := range settingSequence {
-		copyIns := make([]int, len(signals))
+		copyIns := make([]int64, len(signals))
 		copy(copyIns, signals)
 
 		temp1.WriteString(sq)
@@ -82,7 +82,7 @@ func processExtendMulti(signals []int, settingSequence []string) int {
 	result, _ := strconv.Atoi(temp2.String())
 	return result
 }
-func part2(originalIns []int) {
+func part2(originalIns []int64) {
 	max := 0
 	for i := 5; i <= 9; i = i + 1 {
 		for j := 5; j <= 9; j = j + 1 {
@@ -104,7 +104,7 @@ func part2(originalIns []int) {
 	}
 	fmt.Println(max)
 }
-func processExtendMultiLoop(signals []int, settingSequence []string) int {
+func processExtendMultiLoop(signals []int64, settingSequence []string) int {
 	done := make(chan int)
 	donez := make(chan int)
 	ins := []*Buffer{&Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}}
@@ -112,7 +112,7 @@ func processExtendMultiLoop(signals []int, settingSequence []string) int {
 	var wg sync.WaitGroup
 	for i, sq := range settingSequence {
 		wg.Add(1)
-		copyIns := make([]int, len(signals))
+		copyIns := make([]int64, len(signals))
 		copy(copyIns, signals)
 		if i == 0 {
 			ins[i].WriteString(sq + "\n0")

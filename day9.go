@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func day5() {
-	file, err := os.Open("input5.txt")
+func day9() {
+	file, err := os.Open("input9.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,5 +25,6 @@ func day5() {
 	for i := range originalIns {
 		originalIns[i], _ = strconv.ParseInt(ins[i], 10, 64)
 	}
+
 	process(originalIns, os.Stdin, os.Stdout)
 }

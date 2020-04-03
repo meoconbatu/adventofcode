@@ -24,15 +24,15 @@ func day2() {
 
 	ins := strings.Split(scanner.Text(), ",")
 
-	originalIns := make([]int, len(ins))
+	originalIns := make([]int64, len(ins))
 	for i := range originalIns {
-		originalIns[i], _ = strconv.Atoi(ins[i])
+		originalIns[i], _ = strconv.ParseInt(ins[i], 10, 64)
 	}
-	copyIns := make([]int, len(originalIns))
+	copyIns := make([]int64, len(originalIns))
 	for i := 0; i < len(originalIns); i++ {
 		for j := 0; j < len(originalIns); j++ {
 			copy(copyIns, originalIns)
-			copyIns[1], copyIns[2] = i, j
+			copyIns[1], copyIns[2] = int64(i), int64(j)
 			process(copyIns, os.Stdin, os.Stdout)
 			if copyIns[0] == 19690720 {
 				fmt.Println(copyIns)
@@ -41,15 +41,17 @@ func day2() {
 		}
 	}
 }
-func process(ins []int, r io.Reader, w io.Writer) {
+func process(ins []int64, r io.Reader, w io.Writer) {
 	x, y, step := 0, 0, 0
 	done := false
+	maps := make(map[int64]int64)
+	maps[0] = 0
 	for {
 		if done {
 			return
 		}
 		x = y
-		opcode := getOpcode(ins[x])
+		opcode := getOpcode(int(ins[x]))
 
 		if opcode == 1 || opcode == 2 || opcode == 7 || opcode == 8 {
 			step = 4
@@ -62,83 +64,135 @@ func process(ins []int, r io.Reader, w io.Writer) {
 		if y > len(ins) {
 			y = len(ins)
 		}
-		done = processIntcode(ins, ins[x:y], &y, r, w)
+		done = processIntcode(ins, maps, ins[x:y], &y, r, w)
 	}
 }
 func getOpcode(in int) int {
 	return int(math.Mod(float64(in), float64(100)))
 }
-func getPositionMode(in int) (out []int) {
+func getPositionMode(in int) (out [4]int) {
 	postModeStr := strconv.Itoa(in / 100)
+	j := 1
 	for i := len(postModeStr) - 1; i >= 0; i-- {
 		tmp, _ := strconv.Atoi(string(postModeStr[i]))
-		out = append(out, tmp)
+		out[j] = tmp
+		j++
 	}
 	return
 }
-func processIntcode(ins, ins4 []int, nextPoint *int, r io.Reader, w io.Writer) bool {
+func processIntcode(ins []int64, maps map[int64]int64, ins4 []int64, nextPoint *int, r io.Reader, w io.Writer) bool {
 	// fmt.Println(ins)
 	// fmt.Println(ins4)
-	opcode := getOpcode(ins4[0])
-	positionModes := getPositionMode(ins4[0])
-	positions := make([]int, 0)
-	vals := make([]int, 1)
+	opcode := getOpcode(int(ins4[0]))
+	positionModes := getPositionMode(int(ins4[0]))
+	positions := make([]int64, 0)
+	vals := make([]int64, 1)
 	vals[0] = 0
+	val := int64(0)
 	switch opcode {
 	case 1:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
-			} else {
-				vals = append(vals, ins[positions[i]])
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
 			}
+			vals = append(vals, val)
 		}
-		ins[positions[3]] = vals[1] + vals[2]
+		pos := positions[3]
+		if positionModes[3] == 2 {
+			pos += maps[0]
+		}
+		if pos >= int64(len(ins)) {
+			maps[pos] = vals[1] + vals[2]
+		} else {
+			ins[pos] = vals[1] + vals[2]
+		}
 	case 2:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
-			} else {
-				vals = append(vals, ins[positions[i]])
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
 			}
+			vals = append(vals, val)
 		}
-		ins[positions[3]] = vals[1] * vals[2]
+		pos := positions[3]
+		if positionModes[3] == 2 {
+			pos += maps[0]
+		}
+		if pos >= int64(len(ins)) {
+			maps[pos] = vals[1] * vals[2]
+		} else {
+			ins[pos] = vals[1] * vals[2]
+		}
 	case 3:
 		pos1 := ins4[1]
+		var i int64
 		for {
-			var i int
 			n, _ := fmt.Fscan(r, &i)
 			if n == 0 {
-				// time.Sleep(time.Second)
 				continue
 			}
-			// fmt.Printf("in=%d\n", i)
-			ins[pos1] = i
 			break
+		}
+		pos := pos1
+		if positionModes[1] == 2 {
+			pos += maps[0]
+		}
+		if pos >= int64(len(ins)) {
+			maps[pos] = i
+		} else {
+			ins[pos] = i
 		}
 	case 4:
 		pos1 := ins4[1]
-		var val int
-		if positionModes[0] == 1 {
+		switch positionModes[1] {
+		case 0:
+			if pos1 >= int64(len(ins)) {
+				val = maps[pos1]
+			} else {
+				val = ins[pos1]
+			}
+		case 1:
 			val = pos1
-		} else {
-			val = ins[pos1]
+		case 2:
+			newPos := pos1 + maps[0]
+			if newPos >= int64(len(ins)) {
+				val = maps[newPos]
+			} else {
+				val = ins[newPos]
+			}
 		}
 		for {
-			// fmt.Printf("out=%d\n", val)
 			n, err := fmt.Fprintf(w, "%d", val)
 			if n == 0 || err != nil {
-				// time.Sleep(time.Second)
 				continue
 			}
 			break
@@ -146,71 +200,148 @@ func processIntcode(ins, ins4 []int, nextPoint *int, r io.Reader, w io.Writer) b
 	case 5:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
-			} else {
-				vals = append(vals, ins[positions[i]])
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
 			}
+			vals = append(vals, val)
 		}
 		if vals[1] != 0 {
-			*nextPoint = vals[2]
+			*nextPoint = int(vals[2])
 		}
 	case 6:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
-			} else {
-				vals = append(vals, ins[positions[i]])
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
 			}
+			vals = append(vals, val)
 		}
 		if vals[1] == 0 {
-			*nextPoint = vals[2]
+			*nextPoint = int(vals[2])
 		}
 	case 7:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
-			} else {
-				vals = append(vals, ins[positions[i]])
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
 			}
+			vals = append(vals, val)
 		}
+		xx := int64(0)
 		if vals[1] < vals[2] {
-			ins[positions[3]] = 1
+			xx = 1
 		} else {
-			ins[positions[3]] = 0
+			xx = 0
+		}
+		pos := positions[3]
+		if positionModes[3] == 2 {
+			pos += maps[0]
+		}
+		if pos >= int64(len(ins)) {
+			maps[pos] = xx
+		} else {
+			ins[pos] = xx
 		}
 	case 8:
 		positions = append(positions, ins4...)
 		for i := 1; i < 3; i++ {
-			if i-1 < len(positionModes) {
-				if positionModes[i-1] == 0 {
-					vals = append(vals, ins[positions[i]])
+			switch positionModes[i] {
+			case 0:
+				if positions[i] >= int64(len(ins)) {
+					val = maps[positions[i]]
 				} else {
-					vals = append(vals, positions[i])
+					val = ins[positions[i]]
 				}
+			case 1:
+				val = positions[i]
+			case 2:
+				newPos := positions[i] + maps[0]
+				if newPos >= int64(len(ins)) {
+					val = maps[newPos]
+				} else {
+					val = ins[newPos]
+				}
+			}
+			vals = append(vals, val)
+		}
+		xx := int64(0)
+		if vals[1] == vals[2] {
+			xx = 1
+		} else {
+			xx = 0
+		}
+		pos := positions[3]
+		if positionModes[3] == 2 {
+			pos += maps[0]
+		}
+		if pos >= int64(len(ins)) {
+			maps[pos] = xx
+		} else {
+			ins[pos] = xx
+		}
+	case 9:
+		pos1 := ins4[1]
+		var val int64
+		switch positionModes[1] {
+		case 0:
+			if pos1 >= int64(len(ins)) {
+				val = maps[pos1]
 			} else {
-				vals = append(vals, ins[positions[i]])
+				val = ins[pos1]
+			}
+		case 1:
+			val = pos1
+		case 2:
+			newPos := pos1 + maps[0]
+			if newPos >= int64(len(ins)) {
+				val = maps[newPos]
+			} else {
+				val = ins[newPos]
 			}
 		}
-		if vals[1] == vals[2] {
-			ins[positions[3]] = 1
-		} else {
-			ins[positions[3]] = 0
-		}
+		maps[0] += val
 	case 99:
 		return true
 	default:
