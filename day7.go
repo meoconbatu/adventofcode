@@ -107,8 +107,8 @@ func part2(originalIns []int64) {
 func processExtendMultiLoop(signals []int64, settingSequence []string) int {
 	done := make(chan int)
 	donez := make(chan int)
-	ins := []*Buffer{&Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}}
-	outs := []*Buffer{&Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}, &Buffer{}}
+	ins := []*Buffer{{}, {}, {}, {}, {}}
+	outs := []*Buffer{{}, {}, {}, {}, {}}
 	var wg sync.WaitGroup
 	for i, sq := range settingSequence {
 		wg.Add(1)
