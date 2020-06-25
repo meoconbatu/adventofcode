@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -20,7 +21,7 @@ func TestProcessDay9(t *testing.T) {
 		temp := &bytes.Buffer{}
 		temp.WriteString(tt.input2)
 		process(tt.input1, temp, temp)
-		result, _ := strconv.Atoi(temp.String())
+		result, _ := strconv.Atoi(strings.TrimSuffix(temp.String(), "\n"))
 		if int64(result) != tt.expectedOutput {
 			t.Errorf("Sum was incorrect, got: %d, want: %d.", result, tt.expectedOutput)
 		}

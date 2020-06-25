@@ -191,7 +191,8 @@ func processIntcode(ins []int64, maps map[int64]int64, ins4 []int64, nextPoint *
 			}
 		}
 		for {
-			n, err := fmt.Fprintf(w, "%d", val)
+			// n, err := fmt.Fprintf(w, "%d", val)
+			n, err := fmt.Fprintln(w, val)
 			if n == 0 || err != nil {
 				continue
 			}

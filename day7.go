@@ -79,7 +79,7 @@ func processExtendMulti(signals []int64, settingSequence []string) int {
 		process(copyIns, temp1, temp2)
 		// fmt.Println(temp2.String())
 	}
-	result, _ := strconv.Atoi(temp2.String())
+	result, _ := strconv.Atoi(strings.TrimSuffix(temp2.String(), "\n"))
 	return result
 }
 func part2(originalIns []int64) {
