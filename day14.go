@@ -154,6 +154,4 @@ func teardown(maps map[string]reaction, result map[string]material, m material) 
 		result[v.name] = material{v.chemical, v.quantity*int(math.Ceil(float64(m.quantity)/float64(maps[m.name].outMaterial.quantity))) + result[v.name].quantity}
 	}
 	delete(result, m.name)
-	// fmt.Println(m)
-	// fmt.Println(result)
 }
