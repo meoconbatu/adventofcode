@@ -23,7 +23,6 @@ func day16() {
 
 	// fmt.Println(day16Part1(file, 100))
 	fmt.Println(day16Part2(file, 100))
-	// day15Part1(originalIns)
 }
 func day16Part1(in io.Reader, phaseth int) string {
 	scanner := bufio.NewScanner(in)
@@ -36,11 +35,9 @@ func day16Part1(in io.Reader, phaseth int) string {
 	for i := range originalIns {
 		originalIns[i], _ = strconv.ParseInt(ins[i], 10, 64)
 	}
-	// fmt.Println(originalIns)
 	copyIns := make([]int64, len(ins))
 
 	for i := 1; i <= phaseth; i++ {
-		// copy(copyIns, originalIns)
 		for j := 0; j < len(originalIns); j++ {
 			temp := int64(0)
 			for k := 0; k < len(originalIns); k++ {
@@ -79,23 +76,25 @@ func day16Part2(in io.Reader, phaseth int) string {
 
 	tempIns := make([]int64, len(ins))
 	copy(tempIns, originalIns)
-	for i := 0; i < 10000; i++ {
+	
+	for i := 1; i < 10000; i++ {
 		originalIns = append(originalIns, tempIns...)
 	}
-	// fmt.Println(originalIns)
+	
 	copyIns := make([]int64, len(originalIns))
+
+	
 	for i := 1; i <= phaseth; i++ {
-		for j := 0; j < len(originalIns); j++ {
-			temp := int64(0)
-			for k := 0; k < len(originalIns); k++ {
-				kk := (k + 1) / (j + 1)
-				kk = kk % 4
-				temp += originalIns[k] * basePattern[kk]
-			}
+		tempBefore10 := int64(0)
+		for j := len(originalIns)-1;j>= offset; j-- {
+			temp := originalIns[j]*basePattern[1]+tempBefore10
+			
 			copyIns[j] = int64(math.Abs(float64(temp))) % 10
+			
+			tempBefore10 = temp
 		}
+		copy(originalIns, copyIns)
 	}
-	copy(originalIns, copyIns)
 
 	var s []string
 	for i := offset; i < offset+8; i++ {
