@@ -9,6 +9,7 @@ import (
 	"github.com/meoconbatu/adventofcode/2021/day10"
 	"github.com/meoconbatu/adventofcode/2021/day11"
 	"github.com/meoconbatu/adventofcode/2021/day12"
+	"github.com/meoconbatu/adventofcode/2021/day13"
 	"github.com/meoconbatu/adventofcode/2021/day2"
 	"github.com/meoconbatu/adventofcode/2021/day3"
 	"github.com/meoconbatu/adventofcode/2021/day4"
@@ -36,7 +37,7 @@ func init() {
 		"101": day10.Part1, "102": day10.Part2,
 		"111": day11.Part1, "112": day11.Part2,
 		"121": day12.Part1, "122": day12.Part2,
-		// "131": day13.Part1, "132": day13.Part2,
+		"131": day13.Part1, "132": day13.Part2,
 		// "141": day14.Part1, "142": day14.Part2,
 		// "151": day15.Part1, "152": day15.Part2,
 		// "161": day16.Part1, "162": day16.Part2,
