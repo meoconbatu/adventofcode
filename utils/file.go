@@ -10,11 +10,11 @@ import (
 
 // GetInputFile func download input file from website if the file does not exist
 // set force = true to always download
-func GetInputFile(day int, session string, force bool) {
+func GetInputFile(year, day int, session string, force bool) {
 	if _, err := os.Stat(fmt.Sprintf("./day%d/input.txt", day)); err == nil && !force {
 		return
 	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://adventofcode.com/2021/day/%d/input", day), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://adventofcode.com/%d/day/%d/input", year, day), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
