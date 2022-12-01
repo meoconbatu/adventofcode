@@ -26,7 +26,7 @@ func Load() (*Config, error) {
 	viper.BindPFlags(pflag.CommandLine)
 
 	viper.SetConfigName("config")
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("../config")
 	viper.SetConfigType("yml")
 
 	if err := viper.ReadInConfig(); err != nil {
