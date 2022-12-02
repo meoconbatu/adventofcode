@@ -1,10 +1,7 @@
 package day1
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"os"
 	"sort"
 
 	"github.com/meoconbatu/adventofcode/utils"
@@ -15,12 +12,7 @@ type Day1 struct{}
 
 // Part1 func
 func (d Day1) Part1() {
-	f, err := os.Open("day1/input.txt")
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	scanner := bufio.NewScanner(f)
-
+	scanner := utils.NewScanner(1)
 	rs := 0
 	sum := 0
 	for scanner.Scan() {
@@ -38,12 +30,7 @@ func (d Day1) Part1() {
 
 // Part2 func
 func (d Day1) Part2() {
-	f, err := os.Open("day1/input.txt")
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	scanner := bufio.NewScanner(f)
-
+	scanner := utils.NewScanner(1)
 	nums := make([]int, 0)
 	sum := 0
 	for scanner.Scan() {

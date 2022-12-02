@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/meoconbatu/adventofcode/2022/day1"
+	"github.com/meoconbatu/adventofcode/2022/day2"
 )
 
 // Exec interface
@@ -23,6 +24,8 @@ func NewDay(dayth int) *Day {
 	switch dayth {
 	case 1:
 		return &Day{dayth, day1.Day1{}}
+	case 2:
+		return &Day{dayth, day2.Day2{}}
 	}
 	return nil
 }

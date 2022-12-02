@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -39,4 +40,11 @@ func GetInputFile(year, day int, session string, force bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+func NewScanner(dayth int) *bufio.Scanner {
+	f, err := os.Open(fmt.Sprintf("day%d/input.txt", dayth))
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	return bufio.NewScanner(f)
 }
