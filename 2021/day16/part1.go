@@ -11,8 +11,6 @@ import (
 type Day16 struct {
 }
 
-func (d Day16) Part2() {}
-
 // Part1 func
 func (d Day16) Part1() {
 	inputFileName := "day16/input.txt"
@@ -22,7 +20,6 @@ func (d Day16) Part1() {
 }
 func part1Core(message string) int {
 	binarySequence := toBinary(message)
-	fmt.Println(binarySequence)
 	_, versionNumber := Parse(binarySequence)
 	return versionNumber
 }
@@ -34,42 +31,44 @@ func Parse(binarySequence string) (int, int) {
 	remain := binarySequence[6:]
 
 	if typeID == "100" {
+		rsn := 6
 		for {
 			group := remain[:5]
 			remain = remain[5:]
+			rsn += 5
 			if group[0] == '0' {
 				break
 			}
 		}
-		return len(binarySequence), versionNumber
+		return rsn, versionNumber
 	}
 	lengthTypeID := remain[0]
 	if lengthTypeID == '0' {
 		totalLengthInBit := toNumber(remain[1:16])
 		remain = remain[16:]
-		rsn, rsvn := 0, 0
+		rsn, rsvn := 0, versionNumber
 		for {
 			n, vn := Parse(remain)
 			totalLengthInBit -= n
 			rsvn += vn
 			rsn += n
+			remain = remain[n:]
 			if totalLengthInBit < 6 {
 				break
 			}
-			remain = remain[n+1:]
 		}
-		return rsn, rsvn + versionNumber
+		return rsn + 6 + 1 + 15, rsvn
 	}
 	numSubs := toNumber(remain[1:12])
-	remain = remain[13:]
-	rsn, rsvn := 0, 0
+	remain = remain[12:]
+	rsn, rsvn := 0, versionNumber
 	for i := 0; i < numSubs; i++ {
 		n, vn := Parse(remain)
 		rsvn += vn
 		rsn += n
-		remain = remain[n+1:]
+		remain = remain[n:]
 	}
-	return rsn, rsvn + versionNumber
+	return rsn + 6 + 1 + 11, rsvn
 }
 func toNumber(binaryStr string) int {
 	num, err := strconv.ParseInt(binaryStr, 2, 64)
