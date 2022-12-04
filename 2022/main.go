@@ -9,6 +9,7 @@ import (
 
 	"github.com/meoconbatu/adventofcode/2022/day1"
 	"github.com/meoconbatu/adventofcode/2022/day2"
+	"github.com/meoconbatu/adventofcode/2022/day3"
 )
 
 func main() {
@@ -32,6 +33,8 @@ func NewDay(dayth int) *adventofcode.Day {
 		return &adventofcode.Day{dayth, day1.Day1{}}
 	case 2:
 		return &adventofcode.Day{dayth, day2.Day2{}}
+	case 3:
+		return &adventofcode.Day{dayth, day3.Day3{}}
 	}
 	return nil
 }
