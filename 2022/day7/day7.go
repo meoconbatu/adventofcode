@@ -19,6 +19,14 @@ type Node struct {
 	IsFolder bool
 	Size     float64
 }
+type LineType int
+
+const (
+	CD LineType = iota
+	LS
+	FILE
+	FOLDER
+)
 
 var pathToNode = make(map[string]*Node)
 
@@ -28,30 +36,22 @@ func (d Day7) Part1() {
 	var currNode *Node
 	for scanner.Scan() {
 		s := scanner.Text()
-		if isCommand(s) {
-			if s[2:4] == "cd" {
-				to := s[5:]
-				var currPath string
-				switch to {
-				case "/":
-					currPath = "/"
-				case "..":
-					index := strings.LastIndex(currNode.Path[:len(currNode.Path)-1], "/")
-					currPath = currNode.Path[:index+1]
-				default:
-					currPath = currNode.Path + to + "/"
-				}
-				currNode = getFolderByPath(currPath)
+		tpe, name, size := getType(s)
+		switch tpe {
+		case CD:
+			var currPath string
+			switch name {
+			case "/":
+				currPath = "/"
+			case "..":
+				index := strings.LastIndex(currNode.Path[:len(currNode.Path)-1], "/")
+				currPath = currNode.Path[:index+1]
+			default:
+				currPath = currNode.Path + name + "/"
 			}
-		} else {
-			outs := strings.Split(s, " ")
-			var node *Node
-			if outs[0] == "dir" {
-				node = getFolderByPath(currNode.Path + outs[1] + "/")
-			} else {
-				size, _ := strconv.Atoi(outs[0])
-				node = getFileByPath(currNode.Path+outs[1]+"/", float64(size))
-			}
+			currNode = getNodeByPath(currPath, 0, FOLDER)
+		case FILE, FOLDER:
+			node := getNodeByPath(currNode.Path+name+"/", float64(size), tpe)
 			currNode.SubNodes = append(currNode.SubNodes, node)
 		}
 	}
@@ -59,8 +59,19 @@ func (d Day7) Part1() {
 	calcSize(pathToNode["/"], &rs)
 	fmt.Printf("%f\n", rs)
 }
-func isCommand(s string) bool {
-	return s[0] == '$'
+func getType(line string) (LineType, string, int) {
+	if line[0] == '$' {
+		if line[2:4] == "cd" {
+			return CD, line[5:], 0
+		}
+		return LS, "", 0
+	}
+	parts := strings.Split(line, " ")
+	if parts[0] == "dir" {
+		return FOLDER, parts[1], 0
+	}
+	size, _ := strconv.Atoi(parts[0])
+	return FILE, parts[1], size
 }
 func calcSize(root *Node, rs *float64) float64 {
 	if !root.IsFolder {
@@ -76,16 +87,13 @@ func calcSize(root *Node, rs *float64) float64 {
 	}
 	return total
 }
-func getFolderByPath(path string) *Node {
+func getNodeByPath(path string, size float64, tpe LineType) *Node {
 	if pathToNode[path] == nil {
-		pathToNode[path] = &Node{path, nil, true, 0.0}
-	}
-	return pathToNode[path]
-}
-
-func getFileByPath(path string, size float64) *Node {
-	if pathToNode[path] == nil {
-		pathToNode[path] = &Node{path, nil, false, size}
+		if tpe == FOLDER {
+			pathToNode[path] = &Node{path, nil, true, size}
+		} else {
+			pathToNode[path] = &Node{path, nil, false, size}
+		}
 	}
 	return pathToNode[path]
 }
