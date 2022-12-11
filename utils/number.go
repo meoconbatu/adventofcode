@@ -1,5 +1,7 @@
 package utils
 
+import "math"
+
 func Min(a, b int) int {
 	if a < b {
 		return a
@@ -23,4 +25,7 @@ func FindRightMostSetBit(num int) int {
 		num >>= 1
 	}
 	return i
+}
+func Abs(a int) int {
+	return int(math.Abs(float64(a)))
 }
