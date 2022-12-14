@@ -10,10 +10,6 @@ import (
 // Day12 type
 type Day12 struct{}
 
-type Point struct {
-	x, y int
-}
-
 // Part1 func
 func (d Day12) Part1() {
 	grid := readInput()

@@ -16,6 +16,7 @@ type List struct {
 	Lists   []*List
 }
 
+// IsInteger func
 func (l *List) IsInteger() bool {
 	return l.Lists == nil
 }
@@ -32,17 +33,11 @@ func (l *List) String() string {
 
 // Part1 func
 func (d Day13) Part1() {
-	l, ls := readInput()
+	pairs := readInput()
 	rs := 0
-	for i, pair := range l {
-		fmt.Println(i + 1)
-		fmt.Println(ls[i])
-		fmt.Println("--------------------------")
-		if isInRightOrder(pair[0], pair[1]) == 1 {
-			rs += i + 1
-			fmt.Println("------>good")
-		} else {
-			fmt.Println("------>bad")
+	for i := 0; i < len(pairs)-1; i += 2 {
+		if isInRightOrder(pairs[i], pairs[i+1]) == 1 {
+			rs += i/2 + 1
 		}
 	}
 	fmt.Println(rs)
@@ -50,18 +45,32 @@ func (d Day13) Part1() {
 
 // Part2 func
 func (d Day13) Part2() {
-	l := readInput2()
-	sort.Slice(l, func(i, j int) bool {
-		return isInRightOrder(l[i], l[j]) == 1
+	pairs := readInput()
+	dividers := []string{"[[2]]", "[[6]]"}
+	for _, d := range dividers {
+		index := 1
+		pairs = append(pairs, parse(d, &index))
+	}
+
+	sort.Slice(pairs, func(i, j int) bool {
+		return isInRightOrder(pairs[i], pairs[j]) == 1
 	})
-	fmt.Println(l)
+
+	rs := 1
+	for i, pair := range pairs {
+		for _, d := range dividers {
+			if pair.String() == d {
+				rs *= (i + 1)
+				break
+			}
+		}
+	}
+	fmt.Println(rs)
 }
 
-func readInput2() []*List {
+func readInput() []*List {
 	scanner := utils.NewScanner(13)
-
 	rs := make([]*List, 0)
-
 	for scanner.Scan() {
 		var index, index2 int
 		s := scanner.Text()
@@ -71,37 +80,9 @@ func readInput2() []*List {
 		rs = append(rs, parse(s, &index2))
 		scanner.Scan()
 	}
-	var index int
-	rs = append(rs, parse("[[2]]", &index))
-	index = 0
-	rs = append(rs, parse("[[6]]", &index))
 	return rs
 }
-func readInput() ([][]*List, [][]string) {
-	scanner := utils.NewScanner(13)
-
-	rs := make([][]*List, 0)
-
-	lstr := make([][]string, 0)
-	for scanner.Scan() {
-		l := make([]*List, 2)
-		ll := make([]string, 2)
-		var index, index2 int
-		s := scanner.Text()
-		l[0] = parse(s, &index)
-		ll[0] = s
-		scanner.Scan()
-		s = scanner.Text()
-		l[1] = parse(s, &index2)
-		ll[1] = s
-		rs = append(rs, l)
-		lstr = append(lstr, ll)
-		scanner.Scan()
-	}
-	return rs, lstr
-}
 func isInRightOrder(a, b *List) int {
-	// fmt.Println(a, b)
 	if a.IsInteger() && b.IsInteger() {
 		if a.Integer < b.Integer {
 			return 1
@@ -111,27 +92,24 @@ func isInRightOrder(a, b *List) int {
 		}
 		return 0
 	}
-	var newa, newb *List
+	newa, newb := a, b
 	if a.IsInteger() {
 		newa = &List{-1, []*List{a}}
-	} else {
-		newa = a
 	}
 	if b.IsInteger() {
 		newb = &List{-1, []*List{b}}
-	} else {
-		newb = b
 	}
-	for i := 0; i < len(newa.Lists) && i < len(newb.Lists); i++ {
+	na, nb := len(newa.Lists), len(newb.Lists)
+	for i := 0; i < na && i < nb; i++ {
 		temp := isInRightOrder(newa.Lists[i], newb.Lists[i])
 		if temp != 0 {
 			return temp
 		}
 	}
-	if len(newa.Lists) == len(newb.Lists) {
+	if na == nb {
 		return 0
 	}
-	if len(newa.Lists) < len(newb.Lists) {
+	if na < nb {
 		return 1
 	}
 	return -1
@@ -161,6 +139,8 @@ func parse(s string, index *int) *List {
 	*index++
 	return &List{-1, l}
 }
+
+// IsNumber func
 func IsNumber(a byte) bool {
 	return a >= '0' && a <= '9'
 }
