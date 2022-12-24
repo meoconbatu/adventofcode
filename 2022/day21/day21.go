@@ -55,7 +55,7 @@ func (d Day21) Part2() {
 	me := nodes["humn"]
 	me.Value = nil
 	calc(root)
-
+	
 	if root.Left.Value == nil {
 		root.Left.Value = root.Right.Value
 		findX(root.Left)
