@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"time"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -18,7 +17,7 @@ type Config struct {
 // Load func
 func Load() (*Config, error) {
 
-	flag.Int("day", time.Now().Day(), "day of puzzle")
+	flag.Int("day", 0, "day of puzzle")
 	flag.Int("part", 1, "1 or 2")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)

@@ -10,30 +10,33 @@ import (
 // Day5 type
 type Day5 struct{}
 
-var crates = []*utils.Stack[byte]{
-	nil,
-	utils.NewStack([]byte{'R', 'G', 'H', 'Q', 'S', 'B', 'T', 'N'}),
-	utils.NewStack([]byte{'H', 'S', 'F', 'D', 'P', 'Z', 'J'}),
-	utils.NewStack([]byte{'Z', 'H', 'V'}),
-	utils.NewStack([]byte{'M', 'Z', 'J', 'F', 'G', 'H'}),
-	utils.NewStack([]byte{'T', 'Z', 'C', 'D', 'L', 'M', 'S', 'R'}),
-	utils.NewStack([]byte{'M', 'T', 'W', 'V', 'H', 'Z', 'J'}),
-	utils.NewStack([]byte{'T', 'F', 'P', 'L', 'Z'}),
-	utils.NewStack([]byte{'Q', 'V', 'W', 'S'}),
-	utils.NewStack([]byte{'W', 'H', 'L', 'M', 'T', 'D', 'N', 'C'}),
+func newCrates() []*utils.Stack[byte] {
+	return []*utils.Stack[byte]{
+		nil,
+		utils.NewStack([]byte{'R', 'G', 'H', 'Q', 'S', 'B', 'T', 'N'}),
+		utils.NewStack([]byte{'H', 'S', 'F', 'D', 'P', 'Z', 'J'}),
+		utils.NewStack([]byte{'Z', 'H', 'V'}),
+		utils.NewStack([]byte{'M', 'Z', 'J', 'F', 'G', 'H'}),
+		utils.NewStack([]byte{'T', 'Z', 'C', 'D', 'L', 'M', 'S', 'R'}),
+		utils.NewStack([]byte{'M', 'T', 'W', 'V', 'H', 'Z', 'J'}),
+		utils.NewStack([]byte{'T', 'F', 'P', 'L', 'Z'}),
+		utils.NewStack([]byte{'Q', 'V', 'W', 'S'}),
+		utils.NewStack([]byte{'W', 'H', 'L', 'M', 'T', 'D', 'N', 'C'}),
+	}
 }
 
 // Part1 func
 func (d Day5) Part1() {
 	scanner := utils.NewScanner(5)
 	rs := ""
+	crates := newCrates()
 	for scanner.Scan() {
 		var quantity, from, to int
 		n, _ := fmt.Sscanf(scanner.Text(), "move %d from %d to %d\n", &quantity, &from, &to)
 		if n != 3 {
 			continue
 		}
-		move(from, to, quantity)
+		move(crates, from, to, quantity)
 	}
 	for i := 1; i < len(crates); i++ {
 		crate, err := crates[i].Top()
@@ -45,7 +48,7 @@ func (d Day5) Part1() {
 	fmt.Println(rs)
 }
 
-func move(from, to, quantity int) {
+func move(crates []*utils.Stack[byte], from, to, quantity int) {
 	for i := 0; i < quantity; i++ {
 		crate, err := crates[from].Pop()
 		if err != nil {
@@ -59,13 +62,14 @@ func move(from, to, quantity int) {
 func (d Day5) Part2() {
 	scanner := utils.NewScanner(5)
 	rs := ""
+	crates := newCrates()
 	for scanner.Scan() {
 		var quantity, from, to int
 		n, _ := fmt.Sscanf(scanner.Text(), "move %d from %d to %d\n", &quantity, &from, &to)
 		if n != 3 {
 			continue
 		}
-		moveMulti(from, to, quantity)
+		moveMulti(crates, from, to, quantity)
 	}
 	for i := 1; i < len(crates); i++ {
 		crate, err := crates[i].Top()
@@ -77,7 +81,7 @@ func (d Day5) Part2() {
 	fmt.Println(rs)
 }
 
-func moveMulti(from, to, quantity int) {
+func moveMulti(crates []*utils.Stack[byte], from, to, quantity int) {
 	subCrates, err := crates[from].PopMulti(quantity)
 	if err != nil {
 		log.Fatalln(err, subCrates, from, to)

@@ -7,6 +7,9 @@ import (
 	"github.com/meoconbatu/adventofcode/utils"
 )
 
+const MINLINE = 0
+const MAXLINE = 4000000
+
 // Day15 type
 type Day15 struct{}
 
@@ -14,15 +17,15 @@ type Day15 struct{}
 func (d Day15) Part1() {
 	sensorToBeacon := readInput()
 	line := 2000000
-	xs := part(sensorToBeacon, line)
+	intervals := getIntervalsAtLine(sensorToBeacon, line)
 
 	rs := 0
-	for _, x := range xs {
-		rs += x.Y - x.X + 1
+	for _, interval := range intervals {
+		rs += interval.Y - interval.X + 1
 	}
 	visitedBeacon := make(map[utils.Point]bool)
 	for _, b := range sensorToBeacon {
-		for _, x := range xs {
+		for _, x := range intervals {
 			if !visitedBeacon[b] && b.Y == line && b.X >= x.X && b.X <= x.Y {
 				visitedBeacon[b] = true
 				rs--
@@ -32,7 +35,7 @@ func (d Day15) Part1() {
 	}
 	fmt.Println(rs)
 }
-func part(sensorToBeacon map[utils.Point]utils.Point, line int) []utils.Point {
+func getIntervalsAtLine(sensorToBeacon map[utils.Point]utils.Point, line int) []utils.Point {
 	xs := make([]utils.Point, 0)
 	for s, b := range sensorToBeacon {
 		x := fn(s, b, line)
@@ -67,36 +70,39 @@ func reunion(xs *[]utils.Point) {
 
 // Part2 func
 func (d Day15) Part2() {
-	maxline := 4000000
 	sensorToBeacon := readInput()
-	for line := 0; line <= maxline; line++ {
-		xs := part(sensorToBeacon, line)
-		if len(xs) == 2 {
-			fmt.Println((xs[1].X-1)*maxline + line)
+	// findDistressPoint(sensorToBeacon)
+	if p := findDistressPointOptimize(sensorToBeacon); p != nil {
+		fmt.Println(p.X*MAXLINE + p.Y)
+	}
+}
+func findDistressPoint(sensorToBeacon map[utils.Point]utils.Point) {
+	for line := MINLINE; line <= MAXLINE; line++ {
+		intervals := getIntervalsAtLine(sensorToBeacon, line)
+		if len(intervals) == 2 {
+			fmt.Println((intervals[1].X-1)*MAXLINE + line)
 			break
 		}
 	}
 }
-
 func fn(s, b utils.Point, liney int) *utils.Point {
 	distance := utils.Abs(s.X-b.X) + utils.Abs(s.Y-b.Y)
 	l, r, u, d := utils.Point{X: s.X - distance, Y: s.Y}, utils.Point{X: s.X + distance, Y: s.Y},
 		utils.Point{X: s.X, Y: s.Y - distance}, utils.Point{X: s.X, Y: s.Y + distance}
 	if u.Y <= liney && s.Y >= liney {
-		return findIntersection(u, l, r, liney)
+		return getIntersectionPointAtYLine(u, l, r, liney)
 	} else if s.Y <= liney && d.Y >= liney {
-		return findIntersection(d, l, r, liney)
+		return getIntersectionPointAtYLine(d, l, r, liney)
 	}
 	return nil
 }
 
-func findIntersection(d, l, r utils.Point, liney int) *utils.Point {
+func getIntersectionPointAtYLine(d, l, r utils.Point, liney int) *utils.Point {
 	x1 := ((l.Y-d.Y)*d.X - (l.X-d.X)*d.Y + (l.X-d.X)*liney) / (l.Y - d.Y)
 	x2 := ((r.Y-d.Y)*d.X - (r.X-d.X)*d.Y + (r.X-d.X)*liney) / (r.Y - d.Y)
 	return &utils.Point{X: x1, Y: x2}
 }
 
-// Sensor at x=3890859, y=2762958: closest beacon is at x=4037927, y=2985317
 func readInput() map[utils.Point]utils.Point {
 	scanner := utils.NewScanner(15)
 	grid := make(map[utils.Point]utils.Point)

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/meoconbatu/adventofcode"
 	"github.com/meoconbatu/adventofcode/config"
@@ -40,12 +42,18 @@ func main() {
 		log.Fatal("cannot load config:", err)
 	}
 	utils.GetInputFile(2022, conf.Dayth, conf.Session, false)
-
-	day := NewDay(conf.Dayth)
-	if day == nil {
-		log.Fatal("not implement yet")
+	s := time.Now()
+	if conf.Dayth == 0 {
+		for i := 1; i <= 25; i++ {
+			day := NewDay(i)
+			day.Execute(1)
+			day.Execute(2)
+		}
+	} else {
+		day := NewDay(conf.Dayth)
+		day.Execute(conf.Part)
 	}
-	day.Execute(conf.Part)
+	fmt.Println(time.Since(s))
 }
 
 // NewDay func
