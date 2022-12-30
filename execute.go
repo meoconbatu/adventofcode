@@ -19,7 +19,7 @@ type Day struct {
 
 // Execute func
 func (d Day) Execute(part int) {
-	fmt.Printf("day %d, part %d: \n", d.Dayth, part)
+	fmt.Printf("🎄day %d, part %d: \n", d.Dayth, part)
 	s := time.Now()
 	if part == 1 {
 		d.Part1()

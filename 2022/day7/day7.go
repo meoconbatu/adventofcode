@@ -28,36 +28,12 @@ const (
 	FOLDER
 )
 
-var pathToNode = make(map[string]*Node)
-
 // Part1 func
 func (d Day7) Part1() {
-	scanner := utils.NewScanner(7)
-	var currNode *Node
-	for scanner.Scan() {
-		s := scanner.Text()
-		tpe, name, size := getType(s)
-		switch tpe {
-		case CD:
-			var currPath string
-			switch name {
-			case "/":
-				currPath = "/"
-			case "..":
-				index := strings.LastIndex(currNode.Path[:len(currNode.Path)-1], "/")
-				currPath = currNode.Path[:index+1]
-			default:
-				currPath = currNode.Path + name + "/"
-			}
-			currNode = getNodeByPath(currPath, 0, FOLDER)
-		case FILE, FOLDER:
-			node := getNodeByPath(currNode.Path+name+"/", float64(size), tpe)
-			currNode.SubNodes = append(currNode.SubNodes, node)
-		}
-	}
+	pathToNode := readInput()
 	rs := 0.0
 	calcSize(pathToNode["/"], &rs)
-	fmt.Printf("%f\n", rs)
+	fmt.Printf("%.0f\n", rs)
 }
 func getType(line string) (LineType, string, int) {
 	if line[0] == '$' {
@@ -87,7 +63,7 @@ func calcSize(root *Node, rs *float64) float64 {
 	}
 	return total
 }
-func getNodeByPath(path string, size float64, tpe LineType) *Node {
+func getNodeByPath(pathToNode map[string]*Node, path string, size float64, tpe LineType) *Node {
 	if pathToNode[path] == nil {
 		if tpe == FOLDER {
 			pathToNode[path] = &Node{path, nil, true, size}
@@ -100,13 +76,16 @@ func getNodeByPath(path string, size float64, tpe LineType) *Node {
 
 // Part2 func
 func (d Day7) Part2() {
-	d.Part1()
+	pathToNode := readInput()
+	rss := 0.0
+	calcSize(pathToNode["/"], &rss)
+
 	root := pathToNode["/"]
 	free := 70000000 - root.Size
 	need := 30000000 - free
 	rs := 70000000.0
 	findSmallest(root, need, &rs)
-	fmt.Printf("%f\n", rs)
+	fmt.Printf("%.0f\n", rs)
 }
 
 func findSmallest(root *Node, need float64, rs *float64) {
@@ -116,4 +95,31 @@ func findSmallest(root *Node, need float64, rs *float64) {
 		}
 		findSmallest(node, need, rs)
 	}
+}
+func readInput() map[string]*Node {
+	pathToNode := make(map[string]*Node)
+	scanner := utils.NewScanner(7)
+	var currNode *Node
+	for scanner.Scan() {
+		s := scanner.Text()
+		tpe, name, size := getType(s)
+		switch tpe {
+		case CD:
+			var currPath string
+			switch name {
+			case "/":
+				currPath = "/"
+			case "..":
+				index := strings.LastIndex(currNode.Path[:len(currNode.Path)-1], "/")
+				currPath = currNode.Path[:index+1]
+			default:
+				currPath = currNode.Path + name + "/"
+			}
+			currNode = getNodeByPath(pathToNode, currPath, 0, FOLDER)
+		case FILE, FOLDER:
+			node := getNodeByPath(pathToNode, currNode.Path+name+"/", float64(size), tpe)
+			currNode.SubNodes = append(currNode.SubNodes, node)
+		}
+	}
+	return pathToNode
 }

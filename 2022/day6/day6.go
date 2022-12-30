@@ -15,8 +15,8 @@ func (d Day6) Part1() {
 	rs := 0
 	for scanner.Scan() {
 		rs = distinctSubSet(scanner.Text(), 4)
-		fmt.Println(rs)
 	}
+	fmt.Println(rs)
 }
 
 func distinctSubSet(s string, lenSubSet int) int {
@@ -47,6 +47,6 @@ func (d Day6) Part2() {
 	rs := 0
 	for scanner.Scan() {
 		rs = distinctSubSet(scanner.Text(), 14)
-		fmt.Println(rs)
 	}
+	fmt.Println(rs)
 }
