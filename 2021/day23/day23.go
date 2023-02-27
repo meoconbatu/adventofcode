@@ -8,134 +8,137 @@ import (
 	"github.com/meoconbatu/adventofcode/utils"
 )
 
+// Day23 struct
 type Day23 struct {
 }
 
-// #############
-// #...........#
-// ###D#A#D#C###
-//   #C#A#B#B#
-//   #########
-
 // Part1 func
-var rs int
 var roomToEnergy = map[int]int{2: 1, 4: 10, 6: 100, 8: 1000}
 var roomToChar = map[int]string{2: "A", 4: "B", 6: "C", 8: "D"}
+var initHallways = "00000000000"
 
+// Part1 func
 func (d Day23) Part1() {
-	rooms := map[int]int{2: 86, 4: 22, 6: 84, 8: 64}
-	// rooms := map[int]int{2: 42, 4: 68, 6: 46, 8: 82}
-	hallways := "00000000000"
-	rs = math.MaxInt64
-	fn(rooms, hallways, 0)
-	fmt.Println(rs)
+	rooms := map[int][]int{2: {8, 6}, 4: {2, 2}, 6: {8, 4}, 8: {6, 4}}
+	// rooms := map[int][]int{2: {4, 2}, 4: {6, 8}, 6: {4, 6}, 8: {8, 2}}
+	fmt.Println(leastEnergy(rooms))
 }
-func fn(rooms map[int]int, hallways string, totalSteps int) {
-	if totalSteps > rs {
-		return
-	}
-	// print(rooms, hallways)
-	// fmt.Println(totalSteps)
-	end := 0
-	for roomth, room := range rooms {
-		one, two := room/10, room%10
-		if two == roomth && one == roomth {
-			end++
-			continue
-		}
-		if one != 0 && (one != roomth || two != roomth) {
-			if rooms[one] == 0 || (rooms[one]/10 == 0 && rooms[one]%10 == one) {
-				if (one < roomth && hallways[one:roomth+1] == strings.Repeat("0", roomth-one+1)) ||
-					(one > roomth && hallways[roomth:one+1] == strings.Repeat("0", one-roomth+1)) {
-					copyRooms := copyMap(rooms)
-					steps := (utils.Abs(roomth-one) + 2) * roomToEnergy[one]
-					if copyRooms[one] == 0 {
-						copyRooms[one] = one
-						steps += roomToEnergy[one]
-					} else if copyRooms[one]/10 == 0 {
-						copyRooms[one] += one * 10
-					}
-					copyRooms[roomth] %= 10
-					// fmt.Println("one: ", one, roomth)
-					fn(copyRooms, hallways, totalSteps+steps)
-				}
-			} else {
-				for i := 0; i < len(hallways); i++ {
-					if hallways[i] != '0' || roomToEnergy[i] > 0 {
-						continue
-					}
-					if (roomth < i && hallways[roomth:i+1] == strings.Repeat("0", i-roomth+1)) ||
-						(roomth > i && hallways[i:roomth+1] == strings.Repeat("0", roomth-i+1)) {
-						steps := (utils.Abs(i-roomth) + 1) * roomToEnergy[one]
-						copyRooms := copyMap(rooms)
-						copyRooms[roomth] %= 10
-						// fmt.Println("i1: ", i, roomth, string(hallways[i]))
-						fn(copyRooms, fmt.Sprintf("%s%d%s", hallways[:i], one, hallways[i+1:]), totalSteps+steps)
-					}
-				}
-			}
-		}
-		if two != 0 && two != roomth && one == 0 {
-			if rooms[two] == 0 || (rooms[two]/10 == 0 && rooms[two]%10 == two) {
-				if (two < roomth && hallways[two:roomth+1] == strings.Repeat("0", roomth-two+1)) ||
-					(two > roomth && hallways[roomth:two+1] == strings.Repeat("0", two-roomth+1)) {
-					copyRooms := copyMap(rooms)
-					steps := (utils.Abs(roomth-two) + 2 + 1) * roomToEnergy[two]
-					if copyRooms[two] == 0 {
-						copyRooms[two] = two
-						steps += roomToEnergy[two]
-					} else if copyRooms[two]/10 == 0 {
-						copyRooms[two] += two * 10
-					}
-					copyRooms[roomth] /= 10
-					// fmt.Println("two: ", two, roomth)
-					fn(copyRooms, hallways, totalSteps+steps)
-				}
-			} else {
-				for i := 0; i < len(hallways); i++ {
-					if hallways[i] != '0' || roomToEnergy[i] > 0 {
-						continue
-					}
-					if (roomth < i && hallways[roomth:i+1] == strings.Repeat("0", i-roomth+1)) ||
-						(roomth > i && hallways[i:roomth+1] == strings.Repeat("0", roomth-i+1)) {
-						steps := (utils.Abs(i-roomth) + 1 + 1) * roomToEnergy[two]
-						copyRooms := copyMap(rooms)
-						copyRooms[roomth] = 0
-						// fmt.Println("i2: ", i, roomth, string(hallways[i]))
-						fn(copyRooms, fmt.Sprintf("%s%d%s", hallways[:i], two, hallways[i+1:]), totalSteps+steps)
-					}
-				}
-			}
-		}
+func leastEnergy(rooms map[int][]int) int {
+	hallways := initHallways
+	dp = make(map[string]int)
+	return dfs(rooms, hallways, 0)
+}
 
+var dp map[string]int
+
+func dfs(rooms map[int][]int, hallways string, totalSteps int) int {
+	if hallways == initHallways && totalSteps > 0 {
+		return 0
+	}
+	key := genKey(rooms, hallways)
+	if val, ok := dp[key]; ok {
+		return val
+	}
+	minTotalSteps := math.MaxInt64
+	for roomth, room := range rooms {
+		for iroomth, amphipod := range room {
+			if !canMove(rooms, roomth, iroomth) {
+				continue
+			}
+			if pos := findNewPosInRoom(rooms, amphipod); pos != -1 {
+				if (amphipod < roomth && hallways[amphipod:roomth+1] == strings.Repeat("0", roomth-amphipod+1)) ||
+					(amphipod > roomth && hallways[roomth:amphipod+1] == strings.Repeat("0", amphipod-roomth+1)) {
+					steps := (utils.Abs(roomth-amphipod) + 2 + iroomth + pos) * roomToEnergy[amphipod]
+					copyRooms := copyMap(rooms)
+					copyRooms[amphipod][pos] = amphipod
+					copyRooms[roomth][iroomth] = 0
+					temp := dfs(copyRooms, hallways, totalSteps+steps)
+					if temp != math.MaxInt64 {
+						minTotalSteps = utils.Min(minTotalSteps, temp+steps)
+					}
+				}
+			}
+			for i := 0; i < len(hallways); i++ {
+				if hallways[i] != '0' || roomToEnergy[i] > 0 {
+					continue
+				}
+				if (roomth < i && hallways[roomth:i+1] == strings.Repeat("0", i-roomth+1)) ||
+					(roomth > i && hallways[i:roomth+1] == strings.Repeat("0", roomth-i+1)) {
+					steps := (utils.Abs(i-roomth) + 1 + iroomth) * roomToEnergy[amphipod]
+					copyRooms := copyMap(rooms)
+					copyRooms[roomth][iroomth] = 0
+					temp := dfs(copyRooms, fmt.Sprintf("%s%d%s", hallways[:i], amphipod, hallways[i+1:]), totalSteps+steps)
+					if temp != math.MaxInt64 {
+						minTotalSteps = utils.Min(minTotalSteps, temp+steps)
+					}
+				}
+			}
+		}
 	}
 	for i := 0; i < len(hallways); i++ {
 		if hallways[i] == '0' {
 			continue
 		}
 		current := int(hallways[i] - '0')
-		if rooms[current] == 0 || (rooms[current]/10 == 0 && rooms[current]%10 == current) {
+		if pos := findNewPosInRoom(rooms, current); pos != -1 {
 			if (current < i && hallways[current:i] == strings.Repeat("0", i-current)) ||
 				(current > i && hallways[i+1:current+1] == strings.Repeat("0", current-i)) {
+				steps := (utils.Abs(i-current) + 1 + pos) * roomToEnergy[current]
 				copyRooms := copyMap(rooms)
-				steps := (utils.Abs(i-current) + 1) * roomToEnergy[current]
-				if copyRooms[current] == 0 {
-					copyRooms[current] = current
-					steps += roomToEnergy[current]
-				} else if copyRooms[current]/10 == 0 {
-					copyRooms[current] += current * 10
+				copyRooms[current][pos] = current
+				temp := dfs(copyRooms, fmt.Sprintf("%s0%s", hallways[:i], hallways[i+1:]), totalSteps+steps)
+				if temp != math.MaxInt64 {
+					minTotalSteps = utils.Min(minTotalSteps, temp+steps)
 				}
-				// fmt.Println("from i: ", i, hallways[i])
-				fn(copyRooms, fmt.Sprintf("%s0%s", hallways[:i], hallways[i+1:]), totalSteps+steps)
 			}
 		}
 	}
-	if end == 4 {
-		rs = utils.Min(rs, totalSteps)
-		// fmt.Println("rs = ", rs)
-	}
+	dp[key] = minTotalSteps
+	return minTotalSteps
 }
-func print(rooms map[int]int, hallways string) {
+
+func genKey(rooms map[int][]int, hallways string) string {
+	var sb strings.Builder
+	sb.Grow(len(hallways) + 20)
+	for k, vs := range rooms {
+		sb.WriteByte(byte(k))
+		for _, v := range vs {
+			sb.WriteByte(byte(v))
+		}
+	}
+	sb.WriteString(hallways)
+	return sb.String()
+}
+
+func canMove(rooms map[int][]int, roomth, index int) bool {
+	if rooms[roomth][index] == 0 {
+		return false
+	}
+	for i := 0; i < index; i++ {
+		if rooms[roomth][i] != 0 {
+			return false
+		}
+	}
+	for i := index; i < len(rooms[roomth]); i++ {
+		if rooms[roomth][i] != 0 && rooms[roomth][i] != roomth {
+			return true
+		}
+	}
+	return false
+}
+func findNewPosInRoom(rooms map[int][]int, roomth int) int {
+	pos := len(rooms[roomth]) - 1
+	for i := len(rooms[roomth]) - 1; i >= 0; i-- {
+		if rooms[roomth][i] != roomth && rooms[roomth][i] != 0 {
+			return -1
+		}
+		if rooms[roomth][i] == roomth {
+			pos--
+		}
+	}
+	return pos
+}
+func print(rooms map[int][]int, hallways string) {
 	for i := 0; i < len(hallways); i++ {
 		if hallways[i] != '0' {
 			fmt.Print(roomToChar[int(hallways[i]-'0')])
@@ -143,40 +146,35 @@ func print(rooms map[int]int, hallways string) {
 			fmt.Print(".")
 		}
 	}
-	fmt.Println()
-	for i := 0; i < len(hallways); i++ {
-		if _, ok := rooms[i]; ok {
-			if rooms[i]/10 == 0 {
-				fmt.Print(".")
+	for j := 0; j < len(rooms[2]); j++ {
+		fmt.Println()
+		for i := 0; i < len(hallways); i++ {
+			if _, ok := rooms[i]; ok {
+				if rooms[i][j] == 0 {
+					fmt.Print(".")
+				} else {
+					fmt.Print(roomToChar[rooms[i][j]])
+				}
 			} else {
-				fmt.Print(roomToChar[rooms[i]/10])
+				fmt.Print("#")
 			}
-		} else {
-			fmt.Print("#")
-		}
-	}
-	fmt.Println()
-	for i := 0; i < len(hallways); i++ {
-		if _, ok := rooms[i]; ok {
-			if rooms[i]%10 == 0 {
-				fmt.Print(".")
-			} else {
-				fmt.Print(roomToChar[rooms[i]%10])
-			}
-		} else {
-			fmt.Print("#")
 		}
 	}
 	fmt.Println()
 }
-func copyMap[K, V comparable](s map[K]V) map[K]V {
-	copyS := make(map[K]V)
+func copyMap[K comparable, V any](s map[K][]V) map[K][]V {
+	copyS := make(map[K][]V)
 	for k, v := range s {
-		copyS[k] = v
+		newv := make([]V, len(v))
+		copy(newv, v)
+		copyS[k] = newv
 	}
 	return copyS
 }
 
 // Part2 func
 func (d Day23) Part2() {
+	rooms := map[int][]int{2: {8, 8, 8, 6}, 4: {2, 6, 4, 2}, 6: {8, 4, 2, 4}, 8: {6, 2, 6, 4}}
+	// rooms := map[int][]int{2: {4, 8, 8, 2}, 4: {6, 6, 4, 8}, 6: {4, 4, 2, 6}, 8: {8, 2, 6, 2}}
+	fmt.Println(leastEnergy(rooms))
 }
