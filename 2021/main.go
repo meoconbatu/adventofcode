@@ -12,6 +12,7 @@ import (
 	"github.com/meoconbatu/adventofcode/2021/day21"
 	"github.com/meoconbatu/adventofcode/2021/day22"
 	"github.com/meoconbatu/adventofcode/2021/day23"
+	"github.com/meoconbatu/adventofcode/2021/day24"
 	"github.com/meoconbatu/adventofcode/config"
 	"github.com/meoconbatu/adventofcode/utils"
 )
@@ -54,6 +55,8 @@ func NewDay(dayth int) *adventofcode.Day {
 		return &adventofcode.Day{dayth, day22.Day22{}}
 	case 23:
 		return &adventofcode.Day{dayth, day23.Day23{}}
+	case 24:
+		return &adventofcode.Day{dayth, day24.Day24{}}
 	}
 	return nil
 }
