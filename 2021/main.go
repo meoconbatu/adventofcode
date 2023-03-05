@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/meoconbatu/adventofcode"
 	"github.com/meoconbatu/adventofcode/2021/day16"
@@ -13,6 +15,7 @@ import (
 	"github.com/meoconbatu/adventofcode/2021/day22"
 	"github.com/meoconbatu/adventofcode/2021/day23"
 	"github.com/meoconbatu/adventofcode/2021/day24"
+	"github.com/meoconbatu/adventofcode/2021/day25"
 	"github.com/meoconbatu/adventofcode/config"
 	"github.com/meoconbatu/adventofcode/utils"
 )
@@ -24,16 +27,21 @@ func main() {
 	}
 	utils.GetInputFile(2021, conf.Dayth, conf.Session, false)
 
-	day := NewDay(conf.Dayth)
-	if day == nil {
-		log.Fatal("not implement yet")
-	}
-	if conf.Part == 0 {
-		day.Execute(1)
-		day.Execute(2)
+	s := time.Now()
+	if conf.Dayth == 0 {
+		for i := 1; i <= 25; i++ {
+			day := NewDay(i)
+			if day == nil {
+				continue
+			}
+			day.Execute(1)
+			day.Execute(2)
+		}
 	} else {
+		day := NewDay(conf.Dayth)
 		day.Execute(conf.Part)
 	}
+	fmt.Println(time.Since(s))
 }
 
 // NewDay func
@@ -57,6 +65,8 @@ func NewDay(dayth int) *adventofcode.Day {
 		return &adventofcode.Day{dayth, day23.Day23{}}
 	case 24:
 		return &adventofcode.Day{dayth, day24.Day24{}}
+	case 25:
+		return &adventofcode.Day{dayth, day25.Day25{}}
 	}
 	return nil
 }
