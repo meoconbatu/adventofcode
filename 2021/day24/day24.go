@@ -9,8 +9,8 @@ import (
 	"github.com/meoconbatu/adventofcode/utils"
 )
 
-var final, x, y, z, w int
-var dp map[string]bool
+var x, y, z, w int
+var dp map[int]struct{}
 var w1s = [...]int{9, 8, 7, 6, 5, 4, 3, 2, 1}
 var w2s = [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 
@@ -21,49 +21,47 @@ type Day24 struct {
 // Part1 func
 func (d Day24) Part1() {
 	instructions := readInput()
-	final = 0
-	dp = make(map[string]bool)
-	findWs(instructions, 0, 0, w1s)
-	fmt.Println(final)
+	dp = make(map[int]struct{})
+
+	fmt.Println(findWs(instructions, 0, 0, w1s))
 }
 
 // Part2 func
 func (d Day24) Part2() {
 	instructions := readInput()
-	x, y, z, w, final = 0, 0, 0, 0, 0
-	dp = make(map[string]bool)
-	findWs(instructions, 0, 0, w2s)
-	fmt.Println(final)
+	x, y, z, w = 0, 0, 0, 0
+	dp = make(map[int]struct{})
+	fmt.Println(findWs(instructions, 0, 0, w2s))
 }
-func findWs(fs []*instruction, ifs, rs int, ws [9]int) bool {
+func findWs(fs []*instruction, ifs, rs int, ws [9]int) int {
 	prev := ifs
 	for ; ifs < len(fs) && fs[ifs] != nil; ifs++ {
 		if err := (*fs[ifs]).calc(); err != nil {
-			return false
+			return 0
 		}
 	}
-	key := getKey(prev)
+	key := z*100 + prev
 	if _, ok := dp[key]; ok {
-		return false
+		return 0
 	}
 	tempx, tempy, tempz := x, y, z
 	if ifs < len(fs) && fs[ifs] == nil {
 		for i := 0; i < len(ws); i++ {
 			w = ws[i]
-			if findWs(fs, ifs+1, rs*10+w, ws) {
-				return true
+			if v := findWs(fs, ifs+1, rs*10+w, ws); v > 0 {
+				return v
 			}
 			x, y, z = tempx, tempy, tempz
 		}
 	}
 	if ifs == len(fs) {
 		if z == 0 {
-			final = rs
+			return rs
 		}
-		return z == 0
+		return 0
 	}
-	dp[key] = false
-	return false
+	dp[key] = struct{}{}
+	return 0
 }
 
 type instruction struct {
@@ -134,9 +132,6 @@ func (ins instruction) calc() error {
 		}
 	}
 	return nil
-}
-func getKey(ifs int) string {
-	return fmt.Sprintf("%d,%d", ifs, z)
 }
 
 func readInput() []*instruction {
