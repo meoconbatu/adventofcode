@@ -3,12 +3,10 @@ package day18
 import (
 	"fmt"
 	"math"
-	"strconv"
+	"strings"
 
 	"github.com/meoconbatu/adventofcode/utils"
 )
-
-var entrance = "@[]_"
 
 // Day18 type
 type Day18 struct{}
@@ -16,24 +14,36 @@ type Day18 struct{}
 // Part1 func
 func (d Day18) Part1() {
 	tunnels := readInput()
-	fmt.Println(getMinStep(tunnels))
+	fmt.Println(getMinStep(tunnels, "@"))
 }
-func getMinStep(tunnels []string) int {
-	dp = make(map[int]int)
-	edges, keys := initMap(tunnels)
-	return dfs(edges, 0, 0, keys, 0, "")
+
+// Part2 func
+func (d Day18) Part2() {
+	tunnels := readInput()
+	for i, tunnel := range tunnels {
+		if idx := strings.Index(tunnel, "@"); idx != -1 {
+			tunnels[i-1] = tunnels[i-1][:idx-1] + "@#]" + tunnels[i-1][idx+2:]
+			tunnels[i] = tunnel[:idx-1] + "###" + tunnel[idx+2:]
+			tunnels[i+1] = tunnels[i+1][:idx-1] + "[#_" + tunnels[i+1][idx+2:]
+			break
+		}
+	}
+	fmt.Println(getMinStep(tunnels, "@[]_"))
 }
 
 var dp map[int]int
+func getMinStep(tunnels []string, entrance string) int {
+	dp = make(map[int]int)
+	edges, keys := initMap(tunnels)
+	return dfs(edges, entrance, entrance, 0, keys, 0)
+}
 
-func dfs(edges map[int][]int, prev int, holdingKeys, keys int, step int, path string) int {
-	// fmt.Println(strconv.Itoa(prev+'@'), "[", path, "]", step)
-	key := holdingKeys*100 + prev
+func dfs(edges map[int][]int, entrance, prevEntrance string, holdingKeys, keys int, step int) int {
 	if holdingKeys == keys {
 		return 0
 	}
+	key := holdingKeys*100000000 + entranceToInt(prevEntrance)
 	if val, ok := dp[key]; ok {
-		// fmt.Println(strconv.Itoa(prev+'@'), val, step)
 		return val
 	}
 	minStep := math.MaxInt64
@@ -46,7 +56,7 @@ func dfs(edges map[int][]int, prev int, holdingKeys, keys int, step int, path st
 			}
 			newEdges := removeEdge(edges, u, v, currentStep)
 			newEdges = deleteDoor(newEdges, v-32)
-			temp := dfs(newEdges, v, holdingKeys|(1<<(v+'@'-'a')), keys, step+currentStep, fmt.Sprintf("%s, %s", path, strconv.Itoa(i+'@')))
+			temp := dfs(newEdges, entrance, prevEntrance[:j]+string(byte(v+'@'))+prevEntrance[j+1:], holdingKeys|(1<<(v+'@'-'a')), keys, step+currentStep)
 			if temp != math.MaxInt64 {
 				temp += currentStep
 			}
@@ -56,7 +66,13 @@ func dfs(edges map[int][]int, prev int, holdingKeys, keys int, step int, path st
 	dp[key] = minStep
 	return minStep
 }
-
+func entranceToInt(ent string) int {
+	rs := 0
+	for _, e := range ent {
+		rs = rs*58 + int(e-'@')
+	}
+	return rs
+}
 func deleteDoor(edges map[int][]int, u int) map[int][]int {
 	newEdges := copyMap(edges)
 	for i := 0; i < len(newEdges[u]); i++ {
@@ -85,29 +101,27 @@ func deleteDoor(edges map[int][]int, u int) map[int][]int {
 }
 func print(edges map[int][]int) {
 	for door, path := range edges {
-		fmt.Printf("[%s:", strconv.Itoa(door+'@'))
+		fmt.Printf("[%s:", string(byte(door+'@')))
 		for i := 0; i < len(path); i++ {
 			if path[i] == 0 {
 				continue
 			}
-			fmt.Printf("%s(%d),", strconv.Itoa(i+'@'), path[i])
+			fmt.Printf("%s(%d),", string(byte(i+'@')), path[i])
 		}
 		fmt.Printf("] ")
 	}
 	fmt.Println()
 }
+
 func removeEdge(edges map[int][]int, u, v, weight int) map[int][]int {
 	newEdges := deleteDoor(edges, u)
-	// print(newEdges)
 	newEdges[u] = newEdges[v]
 	for i := 0; i < len(newEdges[v]); i++ {
 		if newEdges[v][i] > 0 {
-			newEdges[u][i] = newEdges[v][i]
-			newEdges[i][u] = newEdges[u][i]
+			newEdges[u][i], newEdges[i][u] = newEdges[v][i], newEdges[v][i]
 			newEdges[i][v] = 0
 		}
 	}
-
 	delete(newEdges, v)
 	return newEdges
 }
@@ -121,6 +135,7 @@ func copyMap[K comparable, V any](s map[K][]V) map[K][]V {
 	}
 	return copyS
 }
+
 func isDoor(v int) bool {
 	return v+'@' >= 'A' && v+'@' <= 'Z'
 }
@@ -128,6 +143,7 @@ func isDoor(v int) bool {
 func isEntrance(v int) bool {
 	return !((v+'@' >= 'A' && v+'@' <= 'Z') || (v+'@' >= 'a' && v+'@' <= 'z'))
 }
+
 func initMap(tunnels []string) (map[int][]int, int) {
 	edges := make(map[int][]int)
 	keys := 0
@@ -173,12 +189,6 @@ func findPaths(tunnels []string, start, startx, starty int) []int {
 	return rs
 }
 
-// Part2 func
-func (d Day18) Part2() {
-	// cubes := readInput()
-}
-
-// 7,16,15
 func readInput() []string {
 	scanner := utils.NewScanner(18)
 	rs := make([]string, 0)

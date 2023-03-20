@@ -44,7 +44,7 @@ func TestGetMinStep(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprint(tt.in), func(t *testing.T) {
-			actual := getMinStep(tt.in)
+			actual := getMinStep(tt.in, "@")
 			assert.Equal(t, tt.out, actual)
 		})
 	}
