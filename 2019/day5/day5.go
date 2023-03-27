@@ -14,17 +14,19 @@ type Day5 struct{}
 // Part1 func
 func (d Day5) Part1() {
 	nums := readInput()
-	systempID := 1
-	out := day2.RunProgram(nums, &systempID)
-	fmt.Println(out)
+	input := 1
+	var output int
+	day2.RunProgram(nums, &input, &output)
+	fmt.Println(output)
 }
 
 // Part2 func
 func (d Day5) Part2() {
 	nums := readInput()
-	systempID := 5
-	out := day2.RunProgram(nums, &systempID)
-	fmt.Println(out)
+	input := 5
+	var output int
+	day2.RunProgram(nums, &input, &output)
+	fmt.Println(output)
 }
 
 func readInput() []int {

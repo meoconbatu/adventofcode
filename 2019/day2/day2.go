@@ -1,9 +1,7 @@
 package day2
 
 import (
-	"bytes"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/meoconbatu/adventofcode/utils"
@@ -16,134 +14,91 @@ type Day2 struct{}
 func (d Day2) Part1() {
 	nums := readInput()
 	nums[1], nums[2] = 12, 2
-	out := RunProgram(nums, nil)
+	RunProgram(nums, nil, nil)
 
-	fmt.Println(out)
+	fmt.Println(nums[0])
 }
 
 // RunProgram func
-func RunProgram(nums []int, systemID *int) int {
-	s := ""
-	if systemID != nil {
-		s = fmt.Sprintf("%d\n", *systemID)
-	}
-	bf := bytes.NewBufferString(s)
+func RunProgram(nums []int, input, output *int) {
+	offset := 0
 	i := 0
 	for {
 		op, paramsMode := getMode(nums[i])
 		switch op {
 		case 99:
-			return nums[0]
+			return
 		case 1:
-			ia, ib, ic := nums[i+1], nums[i+2], nums[i+3]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			nums[ic] = a + b
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			nums[nums[i+3]] = vals[0] + vals[1]
 			i += 4
 		case 2:
-			ia, ib, ic := nums[i+1], nums[i+2], nums[i+3]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			nums[ic] = a * b
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			nums[nums[i+3]] = vals[0] * vals[1]
 			i += 4
 		case 3:
 			ia := nums[i+1]
-			var input int
-			inStr, _ := bf.ReadString('\n')
-			inStr = strings.TrimRight(inStr, "\n")
-			fmt.Sscanf(inStr, "%d", &input)
-			nums[ia] = input
+			nums[ia] = *input
 			i += 2
 		case 4:
-			ia := nums[i+1]
-			a := ia
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			bf.WriteString(strconv.Itoa(a) + "\n")
-			fmt.Println(a)
+			vals := getParamsValue(nums, nums[i+1:i+2], paramsMode, offset)
+			*output = vals[0]
 			i += 2
 		case 5:
-			ia, ib := nums[i+1], nums[i+2]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			if a != 0 {
-				i = b
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			if vals[0] != 0 {
+				i = vals[1]
 			} else {
 				i += 3
 			}
 		case 6:
-			ia, ib := nums[i+1], nums[i+2]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			if a == 0 {
-				i = b
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			if vals[0] == 0 {
+				i = vals[1]
 			} else {
 				i += 3
 			}
 		case 7:
-			ia, ib, ic := nums[i+1], nums[i+2], nums[i+3]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			if a < b {
-				nums[ic] = 1
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			if vals[0] < vals[1] {
+				nums[nums[i+3]] = 1
 			} else {
-				nums[ic] = 0
+				nums[nums[i+3]] = 0
 			}
 			i += 4
 		case 8:
-			ia, ib, ic := nums[i+1], nums[i+2], nums[i+3]
-			a, b := ia, ib
-			if paramsMode&1 == 0 {
-				a = nums[ia]
-			}
-			if paramsMode&(1<<1) == 0 {
-				b = nums[ib]
-			}
-			if a == b {
-				nums[ic] = 1
+			vals := getParamsValue(nums, nums[i+1:i+3], paramsMode, offset)
+			if vals[0] == vals[1] {
+				nums[nums[i+3]] = 1
 			} else {
-				nums[ic] = 0
+				nums[nums[i+3]] = 0
 			}
 			i += 4
+		case 9:
+			vals := getParamsValue(nums, nums[i+1:i+2], paramsMode, offset)
+			offset += vals[0]
 		}
 	}
 }
-func getMode(in int) (int, int) {
-	op, temp := in%100, in/100
-	paramsMode := 0
-	for i := 0; temp > 0; i++ {
-		if temp%10 == 1 {
-			paramsMode |= (1 << i)
+func getParamsValue(nums, params []int, paramsMode, offset int) []int {
+	rs := make([]int, len(params))
+	for i := 0; i < len(rs); i++ {
+		var val int
+		switch paramsMode % 10 {
+		case 0:
+			val = nums[params[i]]
+		case 2:
+			val = nums[params[i]+offset]
+		case 1:
+			val = params[i]
 		}
-		temp /= 10
+		paramsMode /= 10
+		rs[i] = val
 	}
-	return op, paramsMode
+	return rs
+}
+func getMode(in int) (int, int) {
+	return in % 100, in / 100
 }
 
 // Part2 func
@@ -154,7 +109,8 @@ func (d Day2) Part2() {
 		for pos2 := 0; pos2 <= 99; pos2++ {
 			copy(copyNums, nums)
 			copyNums[1], copyNums[2] = pos1, pos2
-			if RunProgram(copyNums, nil) == 19690720 {
+			RunProgram(copyNums, nil, nil)
+			if copyNums[0] == 19690720 {
 				fmt.Println(100*pos1 + pos2)
 				return
 			}
@@ -164,14 +120,16 @@ func (d Day2) Part2() {
 
 func readInput() []int {
 	scanner := utils.NewScanner(2)
+	scanner.Scan()
+	return stringToArray(scanner.Text())
+}
+func stringToArray(s string) []int {
 	rs := make([]int, 0)
-	for scanner.Scan() {
-		numStrs := strings.Split(scanner.Text(), ",")
-		var num int
-		for _, numStr := range numStrs {
-			fmt.Sscanf(numStr, "%d", &num)
-			rs = append(rs, num)
-		}
+	numStrs := strings.Split(s, ",")
+	var num int
+	for _, numStr := range numStrs {
+		fmt.Sscanf(numStr, "%d", &num)
+		rs = append(rs, num)
 	}
 	return rs
 }
