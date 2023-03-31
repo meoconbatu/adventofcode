@@ -14,7 +14,8 @@ type Day2 struct{}
 func (d Day2) Part1() {
 	nums := readInput()
 	nums[1], nums[2] = 12, 2
-	RunProgram(nums, nil, nil)
+	ic := Init(nums, nil, nil)
+	ic.Run()
 
 	fmt.Println(nums[0])
 }
@@ -109,7 +110,8 @@ func (d Day2) Part2() {
 		for pos2 := 0; pos2 <= 99; pos2++ {
 			copy(copyNums, nums)
 			copyNums[1], copyNums[2] = pos1, pos2
-			RunProgram(copyNums, nil, nil)
+			ic := Init(copyNums, nil, nil)
+			ic.Run()
 			if copyNums[0] == 19690720 {
 				fmt.Println(100*pos1 + pos2)
 				return

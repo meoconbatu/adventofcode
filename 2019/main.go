@@ -7,8 +7,10 @@ import (
 
 	"github.com/meoconbatu/adventofcode"
 	"github.com/meoconbatu/adventofcode/2019/day18"
+	"github.com/meoconbatu/adventofcode/2019/day19"
 	"github.com/meoconbatu/adventofcode/2019/day2"
 	"github.com/meoconbatu/adventofcode/2019/day5"
+	"github.com/meoconbatu/adventofcode/2019/day9"
 	"github.com/meoconbatu/adventofcode/config"
 	"github.com/meoconbatu/adventofcode/utils"
 )
@@ -43,8 +45,12 @@ func NewDay(dayth int) *adventofcode.Day {
 		return &adventofcode.Day{Dayth: dayth, Exec: day2.Day2{}}
 	case 5:
 		return &adventofcode.Day{Dayth: dayth, Exec: day5.Day5{}}
+	case 9:
+		return &adventofcode.Day{Dayth: dayth, Exec: day9.Day9{}}
 	case 18:
 		return &adventofcode.Day{Dayth: dayth, Exec: day18.Day18{}}
+	case 19:
+		return &adventofcode.Day{Dayth: dayth, Exec: day19.Day19{}}
 	}
 	return nil
 }

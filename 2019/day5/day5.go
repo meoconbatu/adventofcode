@@ -16,7 +16,8 @@ func (d Day5) Part1() {
 	nums := readInput()
 	input := 1
 	var output int
-	day2.RunProgram(nums, &input, &output)
+	ic := day2.Init(nums, []int{input}, &output)
+	ic.Run()
 	fmt.Println(output)
 }
 
@@ -25,7 +26,8 @@ func (d Day5) Part2() {
 	nums := readInput()
 	input := 5
 	var output int
-	day2.RunProgram(nums, &input, &output)
+	ic := day2.Init(nums, []int{input}, &output)
+	ic.Run()
 	fmt.Println(output)
 }
 
