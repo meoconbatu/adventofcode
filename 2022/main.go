@@ -39,7 +39,7 @@ import (
 func main() {
 	conf, err := config.Load()
 	if err != nil {
-		log.Fatal("cannot load config:", err)
+		log.Fatal("cannot load config: ", err)
 	}
 	utils.GetInputFile(2022, conf.Dayth, conf.Session, false)
 	s := time.Now()
@@ -51,7 +51,12 @@ func main() {
 		}
 	} else {
 		day := NewDay(conf.Dayth)
-		day.Execute(conf.Part)
+		if conf.Part == 0 {
+			day.Execute(1)
+			day.Execute(2)
+		} else {
+			day.Execute(conf.Part)
+		}
 	}
 	fmt.Println(time.Since(s))
 }
