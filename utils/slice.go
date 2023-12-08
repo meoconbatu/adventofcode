@@ -1,6 +1,10 @@
 package utils
 
-import "math"
+import (
+	"math"
+	"strconv"
+	"strings"
+)
 
 // FindMinMax func return min and max number of ins array
 func FindMinMax(ins []int) (int, int) {
@@ -39,4 +43,16 @@ func CopySlice(ins []int) []int {
 	copyins := make([]int, len(ins))
 	copy(copyins, ins)
 	return copyins
+}
+
+func ParseIntSlice(numsStr string) []int {
+	nums := make([]int, 0)
+	for _, numStr := range strings.Split(numsStr, " ") {
+		if numStr == "" {
+			continue
+		}
+		num, _ := strconv.Atoi(numStr)
+		nums = append(nums, num)
+	}
+	return nums
 }
