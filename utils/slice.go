@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -55,4 +56,12 @@ func ParseIntSlice(numsStr string) []int {
 		nums = append(nums, num)
 	}
 	return nums
+}
+func SortReverse(nums []int) {
+	sort.Sort(sort.Reverse(sort.IntSlice(nums)))
+}
+func Reverse(nums []int) {
+	for i, j := 0, len(nums)-1; i < j; i, j = i+1, j-1 {
+		nums[i], nums[j] = nums[j], nums[i]
+	}
 }
