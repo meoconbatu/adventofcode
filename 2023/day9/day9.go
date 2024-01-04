@@ -14,7 +14,7 @@ func (d Day9) Part1() {
 	scanner := utils.NewScanner(9)
 	rs := 0
 	for scanner.Scan() {
-		rs += getNextValue(utils.ParseIntSlice(scanner.Text()))
+		rs += getNextValue(utils.ParseIntSlice(scanner.Text(), " "))
 	}
 	fmt.Println(rs)
 }
@@ -43,7 +43,7 @@ func (d Day9) Part2() {
 	scanner := utils.NewScanner(9)
 	rs := 0
 	for scanner.Scan() {
-		nums := utils.ParseIntSlice(scanner.Text())
+		nums := utils.ParseIntSlice(scanner.Text(), " ")
 		utils.Reverse(nums)
 		rs += getNextValue(nums)
 	}

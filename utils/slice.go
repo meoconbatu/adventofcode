@@ -46,9 +46,9 @@ func CopySlice(ins []int) []int {
 	return copyins
 }
 
-func ParseIntSlice(numsStr string) []int {
+func ParseIntSlice(numsStr string, sep string) []int {
 	nums := make([]int, 0)
-	for _, numStr := range strings.Split(numsStr, " ") {
+	for _, numStr := range strings.Split(numsStr, sep) {
 		if numStr == "" {
 			continue
 		}

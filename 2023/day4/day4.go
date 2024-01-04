@@ -91,5 +91,5 @@ func parseLine(line string) (int, []int, []int) {
 	p := strings.Split(line, ": ")
 	fmt.Sscanf(p[0], "Card %d", &id)
 	nums := strings.Split(p[1], " | ")
-	return id, utils.ParseIntSlice(nums[0]), utils.ParseIntSlice(nums[1])
+	return id, utils.ParseIntSlice(nums[0], " "), utils.ParseIntSlice(nums[1], " ")
 }

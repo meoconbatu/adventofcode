@@ -19,7 +19,7 @@ func (d Day5) Part1() {
 	parts := strings.Split(string(b), "\n\n")
 
 	p := strings.Split(parts[0], ": ")
-	seeds := utils.ParseIntSlice(p[1])
+	seeds := utils.ParseIntSlice(p[1], " ")
 
 	m := make([][][]int, 0)
 	for _, part := range parts[1:] {
@@ -53,7 +53,7 @@ func parseRanges(s string) [][]int {
 	lines := strings.Split(string(s), "\n")
 	rs := make([][]int, 0)
 	for _, line := range lines[1:] {
-		rs = append(rs, utils.ParseIntSlice(line))
+		rs = append(rs, utils.ParseIntSlice(line, " "))
 	}
 	sort.Slice(rs, func(i, j int) bool {
 		return rs[i][1] < rs[j][1]
@@ -67,7 +67,7 @@ func (d Day5) Part2() {
 	parts := strings.Split(string(b), "\n\n")
 
 	p := strings.Split(parts[0], ": ")
-	seeds := utils.ParseIntSlice(p[1])
+	seeds := utils.ParseIntSlice(p[1], " ")
 
 	m := make([][][]int, 0)
 	for _, part := range parts[1:] {
@@ -80,7 +80,7 @@ func parseRanges2(s string) [][]int {
 	lines := strings.Split(string(s), "\n")
 	rs := make([][]int, 0)
 	for _, line := range lines[1:] {
-		rs = append(rs, utils.ParseIntSlice(line))
+		rs = append(rs, utils.ParseIntSlice(line, " "))
 	}
 	sort.Slice(rs, func(i, j int) bool {
 		return rs[i][0] < rs[j][0]
