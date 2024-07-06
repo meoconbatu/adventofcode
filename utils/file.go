@@ -3,7 +3,7 @@ package utils
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +12,9 @@ import (
 // GetInputFile func download input file from website if the file does not exist
 // set force = true to always download
 func GetInputFile(year, day int, session string, force bool) {
+	if day == 0 {
+		return
+	}
 	if _, err := os.Stat(fmt.Sprintf("./day%d/input.txt", day)); err == nil && !force {
 		return
 	}
@@ -28,7 +31,7 @@ func GetInputFile(year, day int, session string, force bool) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +39,7 @@ func GetInputFile(year, day int, session string, force bool) {
 	if _, err := os.Stat("/path/to/your-file"); os.IsNotExist(err) {
 		os.MkdirAll(fmt.Sprintf("./day%d", day), 0700)
 	}
-	err = ioutil.WriteFile(fmt.Sprintf("./day%d/input.txt", day), body, 0644)
+	err = os.WriteFile(fmt.Sprintf("./day%d/input.txt", day), body, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
